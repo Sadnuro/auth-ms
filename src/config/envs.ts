@@ -2,7 +2,8 @@ import 'dotenv/config';
 import { z } from 'zod';
 
 export const envSchema = z.object({
-    PORT: z.coerce.number().min(1, 'PORT is required.'),
+    PORT: z.coerce.number().min(1, 'AUTH_MS_PORT is required.'),
+    HOST: z.string(),
     // DB_HOST: z.string(),
     // DB_PORT: z.coerce.number().min(1, 'DB_PORT is required.'),
     // DB_NAME: z.string(),
@@ -22,6 +23,7 @@ if (!envParsed.success) {
 
 export const envs: EnvType = {
     PORT: envParsed.data.PORT,
+    HOST: envParsed.data.HOST,
     ALLOWED_ORIGINS: envParsed.data.ALLOWED_ORIGINS,
     // DB_HOST: envParsed.data.DB_HOST,
     // DB_PORT: envParsed.data.DB_PORT,
