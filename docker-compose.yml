@@ -1,0 +1,44 @@
+services:
+  # Postgres database for authentication data
+  postgres-auth-db:
+    image: postgres:15-alpine
+    container_name: postgres-auth-db
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - '${DB_PORT}:${DB_PORT}'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Redis database for authentication data
+  redis-auth-db:
+    container_name: redis-auth-db
+    image: redis:7.2-alpine
+    restart: always
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes # Allow persistence
+
+  # Auth microservice
+  auth-ms:
+    build: ./
+    container_name: auth-ms
+    volumes:
+      - ./src:/usr/src/app/src
+    ports:
+      - '${PORT}:${PORT}'
+    command: npm run start:dev
+    environment:
+      - PORT=${PORT}
+      - DATABASE_URL=${DATABASE_URL}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+    depends_on:
+      - postgres-auth-db
+      - redis-auth-db
+
+volumes:
+  postgres_data:
+  redis_data:
