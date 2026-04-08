@@ -1,7 +1,7 @@
 services:
   # Postgres database for authentication data
   postgres-auth-db:
-    image: postgres:15-alpine
+    image: postgres:16.2-alpine
     container_name: postgres-auth-db
     restart: always
     environment:
@@ -9,7 +9,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
     ports:
-      - '${DB_PORT}:${DB_PORT}'
+      - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -29,7 +29,7 @@ services:
     volumes:
       - ./src:/usr/src/app/src
     ports:
-      - '${PORT}:${PORT}'
+      - "${PORT}:${PORT}"
     command: npm run start:dev
     environment:
       - PORT=${PORT}
