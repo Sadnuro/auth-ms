@@ -21,6 +21,8 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes # Allow persistence
+    ports:
+      - "${REDIS_PORT}:6379"
 
   # Auth microservice
   auth-ms:
@@ -36,6 +38,7 @@ services:
       - PORT=${PORT}
       - DATABASE_URL=${DATABASE_URL}
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+      - REDIS_URL=${REDIS_URL}
     depends_on:
       - postgres-auth-db
       - redis-auth-db
