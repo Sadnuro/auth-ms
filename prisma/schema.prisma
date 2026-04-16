@@ -38,13 +38,13 @@ model Session {
 model User {
   id String @id @default(uuid())
 
-  name        String
-  lastName    String
+  name        String?
+  lastName    String?
   avatar      String?
   email       String  @unique
   backupEmail String?
   phone       String?
-  password    String
+  password    String?
   country     String? @default("CO")
   language    String? @default("es-ES")
 

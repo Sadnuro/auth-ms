@@ -3,6 +3,8 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 import { envs } from 'src/config';
+import { UsersModule } from './modules/users/users.module';
+import { TestModule } from './modules/test/test.module';
 
 // @Global()
 @Module({
@@ -18,6 +20,8 @@ import { envs } from 'src/config';
       },
     }),
     PrismaModule,
+    UsersModule,
+    TestModule,
   ],
   controllers: [],
   providers: [],
