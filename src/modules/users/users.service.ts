@@ -1,6 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
-import { CreateUserInterface } from 'src/modules/users/interfaces/user.interface';
+import {
+  CreateUserInterface,
+  UpdateUserInterface,
+} from 'src/modules/users/interfaces/user.interface';
 
 @Injectable()
 export class UsersService {
@@ -22,7 +25,13 @@ export class UsersService {
       data: user,
     });
   }
-  async update() {}
+
+  async update(id: string, user: UpdateUserInterface) {
+    return this.prisma.user.update({
+      where: { id },
+      data: user,
+    });
+  }
   async findOne() {}
   async delete() {}
 }

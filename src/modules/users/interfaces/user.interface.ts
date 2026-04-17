@@ -22,7 +22,7 @@ export interface CreateUserInterface {
   authProvider?: AuthProviderEnum;
 }
 
-export interface UpdateUserinterface {
+export interface UpdateUserInterface {
   name?: string;
   lastName?: string;
   avatar?: string;
