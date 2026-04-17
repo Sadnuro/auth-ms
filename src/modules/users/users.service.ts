@@ -1,4 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { UserStatusEnum } from '@prisma/client';
+import { BcryptService } from 'src/modules/bcrypt/bcrypt.service';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import {
   CreateUserInterface,
@@ -7,7 +9,10 @@ import {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly bcrypt: BcryptService,
+  ) {}
 
   private async validateEmail(email: string) {
     const user = await this.prisma.user.findUnique({
@@ -22,16 +27,39 @@ export class UsersService {
   async create(user: CreateUserInterface) {
     await this.validateEmail(user.email);
     return await this.prisma.user.create({
-      data: user,
+      data: {
+        ...user,
+        password: user.password
+          ? await this.bcrypt.hash(user.password)
+          : undefined,
+      },
     });
   }
 
   async update(id: string, user: UpdateUserInterface) {
+    await this.findOne(id);
     return this.prisma.user.update({
-      where: { id },
-      data: user,
+      where: { id: id, status: { notIn: [UserStatusEnum.DRAFT] } },
+      data: { ...user },
     });
   }
-  async findOne() {}
-  async delete() {}
+
+  async findOne(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: id, status: { notIn: [UserStatusEnum.DRAFT] } },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    return user;
+  }
+
+  async delete(id: string) {
+    await this.findOne(id);
+    return this.prisma.user.update({
+      where: { id: id },
+      data: { status: UserStatusEnum.DRAFT },
+    });
+  }
 }
