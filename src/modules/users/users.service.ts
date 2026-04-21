@@ -4,6 +4,7 @@ import { BcryptService } from 'src/modules/bcrypt/bcrypt.service';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import {
   CreateUserInterface,
+  FindOneUserInterface,
   UpdateUserInterface,
 } from 'src/modules/users/interfaces/user.interface';
 
@@ -37,16 +38,26 @@ export class UsersService {
   }
 
   async update(id: string, user: UpdateUserInterface) {
-    await this.findOne(id);
+    await this.findOne({ id });
+    if (user.email) {
+      await this.validateEmail(user.email);
+    }
     return this.prisma.user.update({
       where: { id: id, status: { notIn: [UserStatusEnum.DRAFT] } },
-      data: { ...user },
+      data: {
+        ...user,
+        password: user.password && (await this.bcrypt.hash(user.password)),
+      },
     });
   }
 
-  async findOne(id: string) {
+  async findOne(filter: FindOneUserInterface) {
     const user = await this.prisma.user.findUnique({
-      where: { id: id, status: { notIn: [UserStatusEnum.DRAFT] } },
+      where: {
+        id: filter.id,
+        email: filter.email,
+        status: { notIn: [UserStatusEnum.DRAFT] },
+      },
     });
 
     if (!user) {
@@ -56,7 +67,7 @@ export class UsersService {
   }
 
   async delete(id: string) {
-    await this.findOne(id);
+    await this.findOne({ id });
     return this.prisma.user.update({
       where: { id: id },
       data: { status: UserStatusEnum.DRAFT },

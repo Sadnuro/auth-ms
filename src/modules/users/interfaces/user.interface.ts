@@ -47,9 +47,6 @@ export interface UpdateUserInterface {
 export interface FindOneUserInterface {
   id?: string;
   email?: string;
-  phone?: string;
-  status?: UserStatusEnum;
-  authProvider?: AuthProviderEnum;
 }
 
 export interface DeleteUserInterface {
