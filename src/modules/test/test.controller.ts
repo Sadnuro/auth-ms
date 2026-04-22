@@ -44,4 +44,8 @@ export class TestController {
   async sendEmail(@Body() data: SendEmailDto) {
     return this.emails.sendMail(data);
   }
+  @Post('/email/sendBatch')
+  async sendBatchEmail(@Body() data: SendEmailDto[]) {
+    return this.emails.sendBatchEmail(data);
+  }
 }

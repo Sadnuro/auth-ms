@@ -26,5 +26,21 @@ export class EmailsService {
   }
 
   // Send multiple emails
-  async sendBatchEmail() {}
+  async sendBatchEmail(emails: IEmail[]) {
+    try {
+      if (emails.length === 0) {
+        throw new InternalServerErrorException('No emails to send');
+      }
+      return await this.resend.batch.send(
+        emails.map((email) => ({
+          from: `Earth <${email.from || envs.RESEND_FROM_MAIL!}>`,
+          to: email.to,
+          subject: email.subject,
+          html: email.html,
+        })),
+      );
+    } catch (error: any) {
+      throw new InternalServerErrorException(error.message || '');
+    }
+  }
 }
