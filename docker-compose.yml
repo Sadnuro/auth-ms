@@ -24,18 +24,40 @@ services:
     ports:
       - "${REDIS_PORT}:6379"
 
-  # Auth microservice
-  auth-ms:
-    build: ./
-    container_name: auth-ms
+  # Auth microservice - Development (hot reload, source mounted)
+  auth-ms-dev:
+    container_name: auth-ms-dev
+    restart: unless-stopped
+    build:
+      target: devimage
+      context: .
     volumes:
-      - ./src:/usr/src/app/src
+      - ./src:/app/src
     ports:
-      - "${PORT}:${PORT}"
-    command: sh -c "npx prisma generate && npm run start:dev"
+      - "${PORT_DEV}:${PORT_DEV}"
     environment:
       - HOST=${HOST}
-      - PORT=${PORT}
+      - PORT=${PORT_DEV}
+      - DATABASE_URL=${DATABASE_URL}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+      - REDIS_URL=${REDIS_URL}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - RESEND_FROM_MAIL=${RESEND_FROM_MAIL}
+    depends_on:
+      - postgres-auth-db
+      - redis-auth-db
+  # Auth microservice - Production (optimized compiled image)
+  auth-ms-prod:
+    container_name: auth-ms-prod
+    restart: unless-stopped
+    build:
+      target: prodimage
+      context: .
+    ports:
+      - "${PORT_PROD}:${PORT_PROD}"
+    environment:
+      - HOST=${HOST}
+      - PORT=${PORT_PROD}
       - DATABASE_URL=${DATABASE_URL}
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
       - REDIS_URL=${REDIS_URL}
