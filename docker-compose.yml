@@ -39,6 +39,8 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
       - REDIS_URL=${REDIS_URL}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - RESEND_FROM_MAIL=${RESEND_FROM_MAIL}
     depends_on:
       - postgres-auth-db
       - redis-auth-db

@@ -8,6 +8,7 @@ import { TestModule } from './modules/test/test.module';
 import { BcryptModule } from './modules/bcrypt/bcrypt.module';
 import { SessionsModule } from './modules/sessions/sessions.module';
 import { TokensModule } from './modules/tokens/tokens.module';
+import { EmailsModule } from './modules/emails/emails.module';
 
 // @Global()
 @Module({
@@ -28,6 +29,7 @@ import { TokensModule } from './modules/tokens/tokens.module';
     BcryptModule,
     SessionsModule,
     TokensModule,
+    EmailsModule,
   ],
   controllers: [],
   providers: [],

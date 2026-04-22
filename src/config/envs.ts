@@ -12,10 +12,11 @@ export const envSchema = z
     // DB_PASSWORD: z.string(),
     DATABASE_URL: z.string().min(1, 'DATABASE_URL is required.'),
     REDIS_URL: z.string().min(1, 'REDIS_URL is required.'),
-
     ALLOWED_ORIGINS: z
       .string()
       .transform((val) => val.split(',').map((origin) => origin.trim())),
+    RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required.'),
+    RESEND_FROM_MAIL: z.string().min(1, 'RESEND_FROM_MAIL is required.'),
   })
   .passthrough();
 
@@ -38,4 +39,6 @@ export const envs: EnvType = {
   // DB_PASSWORD: envParsed.data.DB_PASSWORD,
   DATABASE_URL: envParsed.data.DATABASE_URL,
   REDIS_URL: envParsed.data.REDIS_URL,
+  RESEND_API_KEY: envParsed.data.RESEND_API_KEY,
+  RESEND_FROM_MAIL: envParsed.data.RESEND_FROM_MAIL,
 };
