@@ -33,4 +33,8 @@ export class TestController {
   async validate(@Body() data: interfaces.IPayloadToken) {
     return this.tokens.validateToken(data);
   }
+  @Post('/token/revoke')
+  async revoke(@Body() data: interfaces.IRevokeToken) {
+    return this.tokens.revokeToken(data);
+  }
 }
