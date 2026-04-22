@@ -1,6 +1,12 @@
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InputJsonArray } from '@prisma/client/runtime/client';
+import { AuthorizationToken } from 'src/common/enum';
 import {
   ICreateToken,
   IPayloadToken,
@@ -11,40 +17,42 @@ import {
 export class TokensService {
   private readonly randomToken = () =>
     Math.floor(100000 * Math.random() * 900000).toString();
+  private readonly getKey = (userId: string, type: AuthorizationToken) =>
+    `token:${type}:user:${userId}`;
 
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
-  async generateToken({ userId, type, ttl = 900000 }: ICreateToken) {
+  async generateToken(data: ICreateToken) {
     try {
       return await this.cacheManager.set(
-        `token:${type}:user:${userId}`,
-        { userId, type, token: this.randomToken() },
-        ttl,
+        this.getKey(data.userId, data.type),
+        { userId: data.userId, type: data.type, token: this.randomToken() },
+        data.ttl ?? 900000,
       );
     } catch (error) {
-      throw new Error('Failed to generate token');
+      throw new BadRequestException('Failed to generate token');
     }
   }
 
-  async validateToken({ userId, type, token }: IPayloadToken) {
+  async validateToken(data: IPayloadToken) {
     try {
       const payload = await this.cacheManager.get<IPayloadToken>(
-        `token:${type}:user:${userId}`,
+        this.getKey(data.userId, data.type),
       );
-      if (!payload || payload.token !== token) {
+      if (!payload || payload.token !== data.token) {
         throw new UnauthorizedException('Invalid or expired token.');
       }
       return payload;
     } catch (error) {
-      throw new Error('Failed to validate token');
+      throw new BadRequestException(error.message);
     }
   }
 
-  async revokeToken({ userId, type }: IRevokeToken) {
+  async revokeToken(data: IRevokeToken) {
     try {
-      return await this.cacheManager.del(`token:${type}:user:${userId}`);
+      return await this.cacheManager.del(this.getKey(data.userId, data.type));
     } catch (error) {
-      throw new Error('Failed to revoke token');
+      throw new BadRequestException('Failed to revoke token');
     }
   }
 }
