@@ -15,24 +15,36 @@ export class TokensService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
   async generateToken({ userId, type, ttl = 900000 }: ICreateToken) {
-    return await this.cacheManager.set(
-      `token:${type}:user:${userId}`,
-      { userId, type, token: this.randomToken() },
-      ttl,
-    );
+    try {
+      return await this.cacheManager.set(
+        `token:${type}:user:${userId}`,
+        { userId, type, token: this.randomToken() },
+        ttl,
+      );
+    } catch (error) {
+      throw new Error('Failed to generate token');
+    }
   }
 
   async validateToken({ userId, type, token }: IPayloadToken) {
-    const payload = await this.cacheManager.get<IPayloadToken>(
-      `token:${type}:user:${userId}`,
-    );
-    if (!payload || payload.token !== token) {
-      throw new UnauthorizedException('Invalid or expired token.');
+    try {
+      const payload = await this.cacheManager.get<IPayloadToken>(
+        `token:${type}:user:${userId}`,
+      );
+      if (!payload || payload.token !== token) {
+        throw new UnauthorizedException('Invalid or expired token.');
+      }
+      return payload;
+    } catch (error) {
+      throw new Error('Failed to validate token');
     }
-    return payload;
   }
 
   async revokeToken({ userId, type }: IRevokeToken) {
-    return await this.cacheManager.del(`token:${type}:user:${userId}`);
+    try {
+      return await this.cacheManager.del(`token:${type}:user:${userId}`);
+    } catch (error) {
+      throw new Error('Failed to revoke token');
+    }
   }
 }
