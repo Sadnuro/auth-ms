@@ -6,6 +6,8 @@ import { envs } from 'src/config';
 import { UsersModule } from './modules/users/users.module';
 import { TestModule } from './modules/test/test.module';
 import { BcryptModule } from './modules/bcrypt/bcrypt.module';
+import { SessionsModule } from './modules/sessions/sessions.module';
+import { TokensModule } from './modules/tokens/tokens.module';
 
 // @Global()
 @Module({
@@ -24,6 +26,8 @@ import { BcryptModule } from './modules/bcrypt/bcrypt.module';
     UsersModule,
     TestModule,
     BcryptModule,
+    SessionsModule,
+    TokensModule,
   ],
   controllers: [],
   providers: [],
